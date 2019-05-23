@@ -13,20 +13,11 @@
 
 //==============================================================================
 MoonstoneAudioProcessorEditor::MoonstoneAudioProcessorEditor (MoonstoneAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+    : AudioProcessorEditor (&p), processor (p), testBox(0)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
-
-    frequency.setSliderStyle (Slider::LinearBarVertical);
-    frequency.setRange(100.0, 8000.0, 1.0);
-    frequency.setTextBoxStyle (Slider::NoTextBox, false, 90, 0);
-    frequency.setPopupDisplayEnabled (true, false, this);
-    frequency.setTextValueSuffix (" Hz");
-    frequency.setValue(1.0);
-
-//    addAndMakeVisible (&frequency);
+    addAndMakeVisible(testBox);
+    addAndMakeVisible(spectrum);
+    setSize (900, 900);
 }
 
 MoonstoneAudioProcessorEditor::~MoonstoneAudioProcessorEditor()
@@ -41,10 +32,10 @@ void MoonstoneAudioProcessorEditor::paint (Graphics& g)
 
     g.setColour (Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
 }
 
 void MoonstoneAudioProcessorEditor::resized()
 {
-    frequency.setBounds (40, 30, 20, getHeight() - 60);
+    testBox.setBounds(100, 0, getWidth(), getHeight());
+    spectrum.setBounds(0, getHeight() - 300, getWidth(), 300);
 }

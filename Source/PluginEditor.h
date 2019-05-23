@@ -12,6 +12,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "OscillatorBox.h"
+#include "SpectrumDisplay.h"
 
 //==============================================================================
 /**
@@ -26,12 +28,14 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+    SpectrumDisplay spectrum;
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     MoonstoneAudioProcessor& processor;
 
-    Slider frequency;
+    OscillatorBox testBox;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MoonstoneAudioProcessorEditor)
 };

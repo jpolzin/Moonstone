@@ -6,20 +6,21 @@
 //  Copyright © 2019 JUCE. All rights reserved.
 //
 
-#ifndef FMVoice_h
-#define FMVoice_h
+#pragma once
 
 #include "WavetableOscillator.h"
-#include "FMSynthParams.h"
 
+struct WavetableSynthesiserSound : public SynthesiserSound
+{
+public:
+    bool appliesToNote    (int) override        { return true; }
+    bool appliesToChannel (int) override        { return true; }
+};
 
 //==============================================================================
-struct FMVoice   : public SynthesiserVoice
+struct FMVoice : public SynthesiserVoice
 {
-    FMVoice(WaveType waveType) : outputOscillator(new WavetableOscillator(waveType))
-    {
-
-    }
+    FMVoice(unsigned voiceID, unsigned oscID) : voiceID(voiceID), outputOscillatorID(oscID) {}
     
     bool canPlaySound (SynthesiserSound* sound) override
     {
@@ -29,28 +30,29 @@ struct FMVoice   : public SynthesiserVoice
     void startNote (int midiNoteNumber, float velocity,
                     SynthesiserSound*, int /*currentPitchWheelPosition*/) override
     {
-        level = velocity * 0.15;
+        level = velocity * 0.2;
         
-        auto cyclesPerSecond = MidiMessage::getMidiNoteInHertz (midiNoteNumber);
+        auto cyclesPerSecond = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
         cyclesPerSample = cyclesPerSecond / getSampleRate();
-        outputOscillator->startNote(0, cyclesPerSample);
+        getOsc()->startNote(voiceID, cyclesPerSample);
     }
     
     void stopNote (float /*velocity*/, bool allowTailOff) override
     {
         clearCurrentNote();
         cyclesPerSample = 0.0;
-        outputOscillator->stopNote(0);
+        getOsc()->stopNote(voiceID);
     }
     
     void pitchWheelMoved (int) override      {}
     void controllerMoved (int, int) override {}
     
-    void renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override {
+    void renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override
+    {
         if(cyclesPerSample != 0.0) {
             while(--numSamples >= 0) {
-                auto currentSample = (float) (outputOscillator->getCurrentSample(0) * level);
-                outputOscillator->advanceToNextSample(0, numSamples);
+                auto currentSample = (float) (getOsc()->getCurrentSample(outputOscillatorID) * level);
+                getOsc()->advanceToNextSample(0, numSamples);
 
                 for(auto i = outputBuffer.getNumChannels(); --i >= 0;)
                     outputBuffer.addSample(i, startSample, currentSample);
@@ -61,9 +63,14 @@ struct FMVoice   : public SynthesiserVoice
     }
     
 private:
+    WavetableOscillator *getOsc()
+    {
+        return WavetableOscillator::getOsc(outputOscillatorID);
+    }
+
     double cyclesPerSample;
     double level = 0.0;
-    WavetableOscillator* outputOscillator;
+    unsigned voiceID;
+    unsigned outputOscillatorID;
 };
 
-#endif /* FMVoice_h */

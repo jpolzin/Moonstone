@@ -25,14 +25,19 @@
 #include "WavetableOscillator.h"
 
 
-
 //==============================================================================
 class FMSynthesiser   : public Synthesiser
 {
 public:
     FMSynthesiser ()
     {
-        addVoice (new FMVoice(WaveType::SINE));
+        WavetableOscillator::createOscillators();
+
+        for (unsigned voiceID = 0; voiceID < Constants::NUM_VOICES; ++voiceID)
+        {
+            addVoice (new FMVoice(voiceID, 0 /* outputOsc */));
+        }
+
         addSound (new WavetableSynthesiserSound());
     }
 };

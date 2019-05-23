@@ -10,6 +10,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "WavetableOscillator.h"
+
 
 //==============================================================================
 MoonstoneAudioProcessor::MoonstoneAudioProcessor()
@@ -96,6 +98,10 @@ void MoonstoneAudioProcessor::changeProgramName (int index, const String& newNam
 void MoonstoneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     synth.setCurrentPlaybackSampleRate(getSampleRate());
+//    WavetableOscillator::getOsc(0)->addModulator(1);
+//    WavetableOscillator::getOsc(1)->startNote(0, MidiMessage::getMidiNoteInHertz(59) / getSampleRate());
+//    WavetableOscillator::getOsc(1)->setOutputLevel(0.1);
+    synth.noteOn(0, 60, .5);
 }
 
 void MoonstoneAudioProcessor::releaseResources()
@@ -139,6 +145,7 @@ void MoonstoneAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuff
         buffer.clear (i, 0, buffer.getNumSamples());
 
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    dynamic_cast<MoonstoneAudioProcessorEditor*>(getActiveEditor())->spectrum.addBuffer(buffer);
 }
 
 //==============================================================================

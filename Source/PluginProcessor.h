@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "FMSynthesizer.h"
+#include "WavetableOscillator.h"
 
 //==============================================================================
 /**
@@ -59,5 +60,7 @@ public:
 private:
     //==============================================================================
     FMSynthesiser synth;
+    unsigned outputOscillatorID = 0;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MoonstoneAudioProcessor)
 };
