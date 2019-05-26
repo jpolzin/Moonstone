@@ -102,6 +102,7 @@ void MoonstoneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 //    WavetableOscillator::getOsc(1)->startNote(0, MidiMessage::getMidiNoteInHertz(59) / getSampleRate());
 //    WavetableOscillator::getOsc(1)->setOutputLevel(0.1);
     synth.noteOn(0, 60, .5);
+    synth.noteOn(0, 65, .5);
 }
 
 void MoonstoneAudioProcessor::releaseResources()

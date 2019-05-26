@@ -51,8 +51,8 @@ struct FMVoice : public SynthesiserVoice
     {
         if(cyclesPerSample != 0.0) {
             while(--numSamples >= 0) {
-                auto currentSample = (float) (getOsc()->getCurrentSample(outputOscillatorID) * level);
-                getOsc()->advanceToNextSample(0, numSamples);
+                auto currentSample = (float) (getOsc()->getCurrentSample(voiceID) * level);
+                getOsc()->advanceToNextSample(voiceID, numSamples);
 
                 for(auto i = outputBuffer.getNumChannels(); --i >= 0;)
                     outputBuffer.addSample(i, startSample, currentSample);

@@ -39,6 +39,7 @@ WavetableOscillator* WavetableOscillator::getOsc(unsigned oscillatorID)
     return &bank[oscillatorID];
 }
 
+
 float WavetableOscillator::getCurrentSample(unsigned voiceID)
 {
     return interpolateToLocation(voices[voiceID].currentSample) * outputLevel;
@@ -96,7 +97,7 @@ void WavetableOscillator::stopNote(unsigned voiceID)
     }
 }
 
-// adds modulator
+
 void WavetableOscillator::addModulator(unsigned oscillatorID)
 {
     modulators.insert(oscillatorID);
