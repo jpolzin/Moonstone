@@ -15,6 +15,7 @@
 #include <cmath>
 #include <vector>
 #include <set>
+#include <map>
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Constants.h"
@@ -29,11 +30,11 @@ public:
         unsigned currentSampleID = 0;
     };
 
-    enum WaveType {
-        SINE,
-        SAW,
-        SQUARE,
-        TRIANGLE
+    enum {
+        SINE = 1,
+        SAW = 2,
+        SQUARE = 3,
+        TRIANGLE = 4
     };
 
     WavetableOscillator();
@@ -53,25 +54,34 @@ public:
 
     void setSyncFrequencyMultiplier(double multiplier);
     void setOutputLevel(double level);
-    void setWaveType(WaveType waveType);
+    void setWaveType(int waveType);
+
+    const std::map<std::string, int>& getWaveTypes();
+
+    inline double getFrequencyMulitplier() { return syncFrequencyMultiplier; }
+    inline double getOutputLevel() { return outputLevel; }
 
 private:
     // RQ: 0 <= location < 1
     // RT: interpolated sample at fractional location in the table
     float interpolateToLocation(double location);
     
-    void generateSineWave(unsigned length);
+    void generateSineWave(unsigned length = Constants::DEFAULT_WAVETABLE_SIZE);
+    void generateSawWave(unsigned length = Constants::DEFAULT_WAVETABLE_SIZE);
+    void generateSquareWave(unsigned length = Constants::DEFAULT_WAVETABLE_SIZE);
+    void generateTriangleWave(unsigned length = Constants::DEFAULT_WAVETABLE_SIZE);
 
     static unsigned sample_rate;
     static std::vector<WavetableOscillator> bank;
+    static std::map<std::string, int> waveTypesMap;
 
     std::vector<float> wavetable;
     std::set<unsigned> modulators;
 
     std::vector<VoicePosition> voices;
 
-    // oscillator-wide setttings
+    // oscillator-wide settings
     double syncFrequencyMultiplier = 1;
-    double outputLevel = 1;
+    double outputLevel = .2;
 };
 

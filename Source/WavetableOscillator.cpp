@@ -10,8 +10,9 @@
 
 #include "WavetableOscillator.h"
 
-unsigned WavetableOscillator::sample_rate = 0;
+unsigned WavetableOscillator::sample_rate = 44100;
 std::vector<WavetableOscillator> WavetableOscillator::bank = std::vector<WavetableOscillator>();
+std::map<std::string, int> WavetableOscillator::waveTypesMap = std::map<std::string, int>();
 
 WavetableOscillator::WavetableOscillator() : voices(Constants::NUM_VOICES), syncFrequencyMultiplier(1) {
     generateSineWave(1024);
@@ -19,12 +20,18 @@ WavetableOscillator::WavetableOscillator() : voices(Constants::NUM_VOICES), sync
 
 void WavetableOscillator::createOscillators()
 {
-    if (bank.size() != 0)
+    if (bank.empty())
     {
-        return;
+        bank = std::vector<WavetableOscillator>(Constants::NUM_OSCILLATORS);
+    }
+    if (waveTypesMap.empty())
+    {
+        waveTypesMap["Sine"] = SINE;
+        waveTypesMap["Saw"] = SAW;
+        waveTypesMap["Square"] = SQUARE;
+        waveTypesMap["Triangle"] = TRIANGLE;
     }
 
-    bank = std::vector<WavetableOscillator>(Constants::NUM_OSCILLATORS);
 }
 
 WavetableOscillator* WavetableOscillator::getOsc(unsigned oscillatorID)
@@ -116,9 +123,30 @@ void WavetableOscillator::setOutputLevel(double level)
     outputLevel = level;
 }
 
-void WavetableOscillator::setWaveType(WavetableOscillator::WaveType waveType)
+void WavetableOscillator::setWaveType(int waveType)
 {
-    generateSineWave(Constants::DEFAULT_WAVETABLE_SIZE);
+    switch (waveType)
+    {
+    case SINE:
+        generateSineWave();
+        break;
+    case SAW:
+        generateSawWave();
+        break;
+    case SQUARE:
+        generateSquareWave();
+        break;
+    case TRIANGLE:
+        generateTriangleWave();
+        break;
+    default:
+        generateSineWave(Constants::DEFAULT_WAVETABLE_SIZE);
+    }
+}
+
+const std::map<std::string, int>&  WavetableOscillator::getWaveTypes()
+{
+    return waveTypesMap;
 }
 
 
@@ -146,13 +174,74 @@ float WavetableOscillator::interpolateToLocation(double location)
 
 void WavetableOscillator::generateSineWave(unsigned length)
 {
+    std::vector<float> tempTable = std::vector<float>(length);
     double angle = 0;
     double angleDelta = MathConstants<double>::twoPi / length;
-    wavetable = std::vector<float>(length);
 
     for (unsigned i = 0; i < length; ++i)
     {
-        wavetable[i] = sin(angle);
+        tempTable[i] = sin(angle);
         angle += angleDelta;
     }
+
+    wavetable = tempTable;
+}
+
+void WavetableOscillator::generateSawWave(unsigned length)
+{
+    std::vector<float> tempTable = std::vector<float>(length);
+
+    const float delta = 2.0 / length;
+    float accumulator = -1.0;
+    unsigned sample = 0;
+
+    for (; sample < length; ++sample)
+    {
+        tempTable[sample] = accumulator;
+        accumulator += delta;
+    }
+
+    wavetable = tempTable;
+}
+void WavetableOscillator::generateSquareWave(unsigned length)
+{
+    std::vector<float> tempTable = std::vector<float>(length);
+
+    unsigned sample = 0;
+    for (; sample < length / 2; ++sample)
+    {
+        tempTable[sample] = 1.0;
+    }
+    for (; sample < length; ++sample)
+    {
+        tempTable[sample] = -1.0;
+    }
+
+    wavetable = tempTable;
+}
+void WavetableOscillator::generateTriangleWave(unsigned length)
+{
+    std::vector<float> tempTable = std::vector<float>(length);
+
+    float delta = 4.0 / length;
+    float accumulator = 0.0;
+    unsigned sample = 0;
+
+    for (; sample < length / 4; ++sample)
+    {
+        tempTable[sample] = accumulator;
+        accumulator += delta;
+    }
+    for (; sample < 3 * length /4; ++sample)
+    {
+        tempTable[sample] = accumulator;
+        accumulator -= delta;
+    }
+    for (; sample < length; ++sample)
+    {
+        tempTable[sample] = accumulator;
+        accumulator += delta;
+    }
+
+    wavetable = tempTable;
 }

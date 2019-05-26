@@ -17,7 +17,7 @@ MoonstoneAudioProcessorEditor::MoonstoneAudioProcessorEditor (MoonstoneAudioProc
 {
     addAndMakeVisible(testBox);
     addAndMakeVisible(spectrum);
-    setSize (900, 900);
+    setSize (Constants::WINDOW_WIDTH, Constants::WINDOW_HEIGHT);
 }
 
 MoonstoneAudioProcessorEditor::~MoonstoneAudioProcessorEditor()
@@ -36,6 +36,6 @@ void MoonstoneAudioProcessorEditor::paint (Graphics& g)
 
 void MoonstoneAudioProcessorEditor::resized()
 {
-    testBox.setBounds(100, 0, getWidth(), getHeight());
-    spectrum.setBounds(0, getHeight() - 300, getWidth(), 300);
+    testBox.setBounds(100, 0, 300, 200);
+    spectrum.setBounds(0, getHeight() - 200, getWidth(), 200);
 }

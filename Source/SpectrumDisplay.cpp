@@ -9,13 +9,14 @@
 */
 
 #include "SpectrumDisplay.h"
+#include "Constants.h"
 
 SpectrumDisplay::SpectrumDisplay() : forwardFFT(fftOrder),
     window(fftSize, dsp::WindowingFunction<float>::blackman)
 {
     setOpaque (true);
     startTimerHz (20);
-    setSize (700, 500);
+    setSize (Constants::WINDOW_WIDTH, 100);
 }
 
 void SpectrumDisplay::addBuffer(AudioBuffer<float> &buffer)
@@ -104,7 +105,7 @@ void SpectrumDisplay::drawFrame(Graphics& g)
                       jmap (scopeData[i],     0.0f, 1.0f, (float) height, 0.0f) });
     }
 
-    float delta = 100 * scopeSize * 4 / 44100;
+    float delta = 145 * scopeSize * 4 / 44100;
     float freq = delta + 3;
     int count = 1;
 
